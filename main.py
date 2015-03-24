@@ -48,8 +48,9 @@ best = 999
 best_val = args.word
 with open("data/formy_utf.txt") as file:
     for word in file:
-        distance = lev(unicode(word, "utf-8"), args.word)
+        distance = lev(word, args.word)
         if distance < best:
-            best, best_val = distance, unicode(word, "utf-8")
+            best, best_val = distance, word
+            print(best_val)
 
 print(best_val)
