@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import multiprocessing
 
 inf = 100
 similar_chars = {u"1:2", u"2:3", u"3:4", u"4:5", u"5:6", u"6:7", u"7:8", u"8:9", u"9:0",
@@ -19,7 +20,7 @@ def char_distance(a, b):
         return 0
     if len(a) == 2 and len(b) == 2 and a[0] == b[1] and b[0] == a[1]:
         return 0.5
-    if (a + ":" + b in similar_chars) or (b + ":" + a in similar_chars):
+    if (a + u":" + b in similar_chars) or (b + u":" + a in similar_chars):
         return 0.5
     if len(a) == 1 and len(b) == 1:
         return 1
@@ -49,6 +50,13 @@ def lev(word1, word2):
                 )
     return row[len(word2) % 3][-1]
 
+
+def distance(input):
+    (word, arg) = input
+    word_unicode = unicode(word[:-1], "utf-8")
+    return lev(word_unicode, arg), word.decode("utf-8")
+
+pool = multiprocessing.Pool()
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     description='This script corrects misspelled words')
@@ -59,14 +67,17 @@ parser.add_argument(
     dest='word')
 [args, pass_args] = parser.parse_known_args()
 
-# standard way
+# check all words
+arg = unicode(args.word, "utf-8")
 best = inf
-best_val = args.word
+best_val = arg
 with open("data/formy_utf.txt") as file:
-    for word in file:
-        distance = lev(word, args.word)
-        if distance < best:
-            best, best_val = distance, word
-            print(best_val)
-print(best_val)
+    words = file.readlines()
+    words = zip(words, [arg]*len(words))
+    words = pool.map(distance, words)
+words.sort(key=lambda tup: tup[0])
 
+# print results
+for (val, word) in words[:10]:
+    print(val)
+    print(word)
