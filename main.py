@@ -4,15 +4,17 @@
 import argparse
 import multiprocessing
 
+# global variables
 inf = 100
-similar_chars = {u"1:2", u"2:3", u"3:4", u"4:5", u"5:6", u"6:7", u"7:8", u"8:9", u"9:0",
-                 u"q:w", u"w:e", u"e:r", u"r:t", u"t:y", u"y:u", u"u:i", u"i:o", u"o:p",
-                 u"a:s", u"s:d", u"d:f", u"f:g", u"g:h", u"h:j", u"j:k", u"k:l",
-                 u"z:x", u"x:c", u"c:v", u"v:b", u"b:n", u"n:m",
-                 u"q:a", u"a:z", u"w:s", u"s:x", u"e:d", u"d:c", u"r:f", u"f:v", u"t:g", u"g:b", u"y:h", u"h:n", u"u:j", u"j:m", u"i:k", u"o:l",
-                 u"w:a", u"e:s", u"s:z", u"r:d", u"d:x", u"t:f", u"f:c", u"y:g", u"g:v", u"u:h", u"h:b", u"i:j", u"j:n", u"o:k", u"k:m", u"p:l",
-                 u"e:ę", u"u:ó", u"o:ó", u"a:ą", u"l:ł", u"z:ż", u"z:ź", u"ż:ź", u"c:ć", u"n:ń",
-                 u"sz:rz", u"ż:rz", u"h:ch", u"z:rz", u"ą:on", u"ę:en"}
+similar_chars = {
+    # u"1:2", u"2:3", u"3:4", u"4:5", u"5:6", u"6:7", u"7:8", u"8:9", u"9:0",
+    # u"q:w", u"w:e", u"e:r", u"r:t", u"t:y", u"y:u", u"u:i", u"i:o", u"o:p",
+    # u"a:s", u"s:d", u"d:f", u"f:g", u"g:h", u"h:j", u"j:k", u"k:l",
+    # u"z:x", u"x:c", u"c:v", u"v:b", u"b:n", u"n:m",
+    # u"q:a", u"a:z", u"w:s", u"s:x", u"e:d", u"d:c", u"r:f", u"f:v", u"t:g", u"g:b", u"y:h", u"h:n", u"u:j", u"j:m", u"i:k", u"o:l",
+    # u"w:a", u"e:s", u"s:z", u"r:d", u"d:x", u"t:f", u"f:c", u"y:g", u"g:v", u"u:h", u"h:b", u"i:j", u"j:n", u"o:k", u"k:m", u"p:l",
+    u"e:ę", u"u:ó", u"o:ó", u"a:ą", u"l:ł", u"z:ż", u"z:ź", u"ż:ź", u"c:ć", u"n:ń",
+    u"sz:rz", u"ż:rz", u"h:ch", u"z:rz", u"ą:on", u"ę:en"}
 
 
 def char_distance(a, b):
@@ -56,7 +58,10 @@ def distance(input):
     word_unicode = unicode(word[:-1], "utf-8")
     return lev(word_unicode, arg), word.decode("utf-8")
 
+# Initialize thread pool
 pool = multiprocessing.Pool()
+
+# Parse args
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     description='This script corrects misspelled words')
@@ -67,7 +72,7 @@ parser.add_argument(
     dest='word')
 [args, pass_args] = parser.parse_known_args()
 
-# check all words
+# Check all words
 arg = unicode(args.word, "utf-8")
 best = inf
 best_val = arg
@@ -77,7 +82,7 @@ with open("data/formy_utf.txt") as file:
     words = pool.map(distance, words)
 words.sort(key=lambda tup: tup[0])
 
-# print results
+# Print results
 for (val, word) in words[:10]:
     print(val)
     print(word)
